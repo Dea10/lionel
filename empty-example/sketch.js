@@ -8,6 +8,7 @@ let allPhrases;
 let stats;
 
 
+
 let fitness = 0;
 
 class impala{
@@ -27,20 +28,74 @@ class impala{
  		this.x += 27;
  	}
  	verArriba(){
- 		return true;
- 	}
- 	verAbajo(){
- 		return true;
- 	}
+    fill(255,0,0,90);
+    beginShape();
+    vertex(0,0);
+    vertex(width/2,height/2);
+    vertex(width,0);
+    endShape(CLOSE);
+  }
  	verDerecha(){
- 		return true;
+ 		fill(255,0,0,90);
+    beginShape();
+    vertex(width,0);
+    vertex(width/2,height/2);
+    vertex(width,height);
+    endShape(CLOSE);
  	}
  	verIzquierda(){
- 		return true;
+ 		fill(255,0,0,90);
+    beginShape();
+    vertex(0,0);
+    vertex(width/2,height/2);
+    vertex(0,height);
+    endShape(CLOSE);
  	}
  	beber(){
- 		return true;
+    return true;
  	}
+  evaluarIzquierda(lionel){
+    if (lionel.x<=width/2){
+      if(lionel.y<=height/2){
+        if(lionel.x<=lionel.y){
+          console.log("Aqui tá izquierda");
+        }
+      }
+      else{
+        if(lionel.x<=abs(lionel.y-height)){
+          console.log("Aqui tá izquierda");
+        }
+      }
+    }
+  }
+  evaluarDerecha(lionel){
+    if (lionel.x>=width/2){
+      if(lionel.y<=height/2){
+        if(lionel.y<=lionel.x){
+          console.log("Aqui tá derecha");
+        }
+      }
+      else{
+        if(lionel.x>=lionel.y){
+          console.log("Aqui tá derecha");
+        }
+      }
+    }
+  }
+  evaluarArriba(lionel){
+    if (lionel.y<=height/2){
+      if(lionel.x<=width/2){
+        if(lionel.y<=lionel.x){
+          console.log("Aqui tá arriba");
+        }
+      }
+      else{
+        if(lionel.y<=abs(lionel.x-width)){
+          console.log("Aqui tá arriba");
+        }
+      }
+    }
+  }
 }
 
 class leon{
@@ -48,19 +103,19 @@ class leon{
 		let x =floor(random(0,8))
 		switch(x){
 			case 1:
-				this.x=27/2;
-				this.y=27/2;
+				this.x=13.5;
+				this.y=13.5;
 				break;
 			case 2:
 				this.x=width/2;
-				this.y=27/2;
+				this.y=13.5;
 				break;
 			case 3:
 				this.x=width-27/2;
-				this.y=27/2;
+				this.y=13.5;
 				break;
 			case 4:
-				this.x=27/2;
+				this.x=13.5;
 				this.y=width/2;
 				break;
 			case 5:
@@ -68,14 +123,14 @@ class leon{
 				this.y=width/2;
 				break;
 			case 6:
-				this.x=27/2;
+				this.x=13.5;
 				this.y=width-27/2;
 				break;
 			case 7:
 				this.x=width/2;
 				this.y=width-27/2;
 				break;
-			case 27/2:
+			case 0:
 				this.x=width-27/2;
 				this.y=width-27/2;
 				break;
@@ -119,6 +174,7 @@ function setup() {
 	lionel = new leon();
 	l2 = new leon();
 	bambi = new impala();
+  frameRate(5);
 }
 
 function draw() {
@@ -146,10 +202,10 @@ function draw() {
 
   	//impala
   	bambi.display();
-
+    lionel.display();
   	//movimientos de lionel
   	if(lionel.x < 25 || lionel.x > 475 || lionel.y > 475 || lionel.y < 25){ //está en algún borde
-  		console.log('borde');
+  		//console.log('borde');
   		if(lionel.x < 25){ //izquierda
   			if(lionel.y < 25){ //arriba
   				//movimientos abajo derecha
@@ -210,7 +266,7 @@ function draw() {
   			}
   		}
   	}else{ //no está en ningún borde -> movimiento aleatorio
-  		console.log('ningún borde');
+  		//console.log('ningún borde');
   		switch(floor(random(0,4))){
   			case 1:
   				lionel.moverI();
@@ -227,10 +283,29 @@ function draw() {
   		}
   	}
 
+    //Bambi ve hacia todos lados ALV
+    switch(floor(random(0,4))){
+        case 1:
+          bambi.verArriba();
+          bambi.evaluarArriba(lionel);
+          break;
+        case 2: 
+          bambi.verIzquierda();
+          bambi.evaluarIzquierda(lionel);
+          break;
+        case 3:
+          bambi.verDerecha();
+          bambi.evaluarDerecha(lionel);
+          break;
+        default: 
+          bambi.beber();
+          break;
+      }
+
 
   	fitness++; //contador de movimientos
-  	console.log(lionel.x + ','+ lionel.y);
-  	lionel.display();
+  	//console.log(lionel.x + ','+ lionel.y);
+
 
   	//momento en que lionel caza a bambi
   	if(lionel.x == bambi.x && lionel.y == bambi.y){
@@ -238,9 +313,9 @@ function draw() {
   		console.log('Fitness: ' + fitness);
   		noLoop();
   	}
+    
 
-  	sleep(10); //para realentizar el paso de ciclos
+  	//sleep(100); //para realentizar el paso de ciclos
 
-  	
 	
 }

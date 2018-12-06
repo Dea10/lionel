@@ -7,6 +7,8 @@ let bestPhrase;
 let allPhrases;
 let stats;
 
+let distancia = 27;
+
 
 
 let fitness = 0;
@@ -15,17 +17,18 @@ class impala{
 	constructor(){
 		this.x = width/2;
 		this.y = height/2;
+		this.huir = false;
 	}
 	display(){
 		fill(50, 100, 150, 200);
   		stroke(0, 0, 0);
   		triangle((this.x)-10,(this.y)+12, (this.x)+10, (this.y)+12,(this.x), (this.y)-8);
 	}
-	moverI(){
- 		this.x -= 27;
+	moverI(distancia){
+ 		this.x -= distancia;
  	}
- 	moverD(){
- 		this.x += 27;
+ 	moverD(distancia){
+ 		this.x += distancia;
  	}
  	verArriba(){
     fill(255,0,0,90);
@@ -59,11 +62,13 @@ class impala{
       if(lionel.y<=height/2){
         if(lionel.x<=lionel.y){
           console.log("Aqui tá izquierda");
+					return true;
         }
       }
       else{
         if(lionel.x<=abs(lionel.y-height)){
           console.log("Aqui tá izquierda");
+					return true;
         }
       }
     }
@@ -73,11 +78,13 @@ class impala{
       if(lionel.y<=height/2){
         if(lionel.y<=lionel.x){
           console.log("Aqui tá derecha");
+					return true;
         }
       }
       else{
         if(lionel.x>=lionel.y){
           console.log("Aqui tá derecha");
+					return true;
         }
       }
     }
@@ -87,11 +94,13 @@ class impala{
       if(lionel.x<=width/2){
         if(lionel.y<=lionel.x){
           console.log("Aqui tá arriba");
+					return true;
         }
       }
       else{
         if(lionel.y<=abs(lionel.x-width)){
           console.log("Aqui tá arriba");
+					return true;
         }
       }
     }
@@ -193,7 +202,7 @@ function draw() {
 	stroke(255,0,0);
 	line(0,0,513,513)
 	line(0,513,513,0)
-	
+
 	//río
 	fill(0,0,255,200)
 	stroke(0,0,255)
@@ -271,51 +280,92 @@ function draw() {
   			case 1:
   				lionel.moverI();
   				break;
-  			case 2: 
+  			case 2:
   				lionel.moverD();
   				break;
   			case 3:
   				lionel.subir();
   				break;
-  			default: 
+  			default:
   				lionel.bajar();
   				break;
   		}
   	}
 
-    //Bambi ve hacia todos lados ALV
-    switch(floor(random(0,4))){
-        case 1:
-          bambi.verArriba();
-          bambi.evaluarArriba(lionel);
-          break;
-        case 2: 
-          bambi.verIzquierda();
-          bambi.evaluarIzquierda(lionel);
-          break;
-        case 3:
-          bambi.verDerecha();
-          bambi.evaluarDerecha(lionel);
-          break;
-        default: 
-          bambi.beber();
-          break;
-      }
-
-
   	fitness++; //contador de movimientos
   	//console.log(lionel.x + ','+ lionel.y);
+		if(bambi.huir == true){
+			BambiHuye(bambi);
+		}
 
+		BambiVe(bambi);
 
   	//momento en que lionel caza a bambi
-  	if(lionel.x == bambi.x && lionel.y == bambi.y){
+  	if((lionel.x == bambi.x && lionel.y == bambi.y) || (bambi.x <= 0 || bambi.x >width)){
   		console.log('grr!');
   		console.log('Fitness: ' + fitness);
   		noLoop();
   	}
-    
+
 
   	//sleep(100); //para realentizar el paso de ciclos
 
-	
+}
+
+//Bambi ve hacia todos lados ALV
+function BambiVe(bambi){
+switch(floor(random(0,4))){
+		case 1:
+			bambi.verArriba();
+			if(bambi.evaluarArriba(lionel)){
+				bambi.huir = true;
+				console.log(bambi.huir);
+			}
+			else {
+				bambi.huir = false;
+			}
+			break;
+		case 2:
+			bambi.verIzquierda();
+			if(bambi.evaluarIzquierda(lionel)){
+			bambi.huir = true;
+			console.log(bambi.huir);
+		}
+		else {
+			bambi.huir = false;
+		}
+			break;
+		case 3:
+			bambi.verDerecha();
+			if(bambi.evaluarDerecha(lionel)){
+			bambi.huir = true;
+			console.log(bambi.huir);
+		}
+		else {
+			bambi.huir = false;
+		}
+			break;
+		default:
+			if(bambi.beber()){
+				bambi.huir = false;
+				console.log(bambi.huir);
+			}
+			else {
+				bambi.huir = false;
+			}
+			break;
+	}
+}
+
+function BambiHuye(bambi){
+	switch (floor(random(0,2))) {
+		case 0:
+		bambi.moverD(distancia);
+			break;
+		case 1:
+		bambi.moverI(distancia);
+			break;
+		default:
+	}
+	distancia += 27;
 }

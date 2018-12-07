@@ -7,8 +7,10 @@ let bestPhrase;
 let allPhrases;
 let stats;
 
-let distancia = 27;
-
+let distanciaImpala = 27;
+let distanciaLeon = 27;
+let decisionesLeon = [100];
+let decisionesImpala = [100];
 
 
 let fitness = 0;
@@ -24,11 +26,11 @@ class impala{
   		stroke(0, 0, 0);
   		triangle((this.x)-10,(this.y)+12, (this.x)+10, (this.y)+12,(this.x), (this.y)-8);
 	}
-	moverI(distancia){
- 		this.x -= distancia;
+	moverI(distanciaImpala){
+ 		this.x -= distanciaImpala;
  	}
- 	moverD(distancia){
- 		this.x += distancia;
+ 	moverD(distanciaImpala){
+ 		this.x += distanciaImpala;
  	}
  	verArriba(){
     fill(255,0,0,90);
@@ -60,55 +62,54 @@ class impala{
   evaluarIzquierda(lionel){
     if (lionel.x<=width/2){
       if(lionel.y<=height/2){
-        if(lionel.x<=lionel.y){
-          console.log("Aqui tá izquierda");
+        if(lionel.x<=lionel.y && lionel.escondido == false){          
 					return true;
         }
       }
       else{
-        if(lionel.x<=abs(lionel.y-height)){
-          console.log("Aqui tá izquierda");
+        if(lionel.x<=abs(lionel.y-height) && lionel.escondido == false){
 					return true;
         }
       }
     }
+    return false;
   }
   evaluarDerecha(lionel){
     if (lionel.x>=width/2){
       if(lionel.y<=height/2){
-        if(lionel.y<=lionel.x){
-          console.log("Aqui tá derecha");
+        if(lionel.y<=lionel.x && lionel.escondido == false){          
 					return true;
         }
       }
       else{
-        if(lionel.x>=lionel.y){
-          console.log("Aqui tá derecha");
+        if(lionel.x>=lionel.y && lionel.escondido == false){          
 					return true;
         }
       }
     }
+    return false;
   }
   evaluarArriba(lionel){
     if (lionel.y<=height/2){
       if(lionel.x<=width/2){
-        if(lionel.y<=lionel.x){
-          console.log("Aqui tá arriba");
+        if(lionel.y<=lionel.x && lionel.escondido == false){          
 					return true;
         }
       }
       else{
-        if(lionel.y<=abs(lionel.x-width)){
-          console.log("Aqui tá arriba");
+        if(lionel.y<=abs(lionel.x-width) && lionel.escondido == false){          
 					return true;
         }
       }
     }
+    return false;
   }
 }
 
 class leon{
 	constructor(){
+    this.escondido = false;
+    this.ataca = false;
 		let x =floor(random(0,8))
 		switch(x){
 			case 1:
@@ -155,18 +156,34 @@ class leon{
   		ellipse(this.x,this.y, 15,15);
   	}
 
- 	moverI(){
- 		this.x -= 27;
+ 	moverI(distanciaLeon){
+    if(this.x - distanciaLeon >= 0){
+      this.x -= distanciaLeon;
+    }
+    else
+      this.x += distanciaLeon;   
  	}
- 	moverD(){
- 		this.x += 27;
- 	}
- 	bajar(){
- 		this.y += 27;
- 	}
- 	subir(){
- 		this.y -= 27;
- 	}
+ 	moverD(distanciaLeon){
+ 		  if(this.x + distanciaLeon <= width){
+      this.x += distanciaLeon;
+    }
+    else
+      this.x -= distanciaLeon;   
+  }
+ 	bajar(distanciaLeon){
+ 		  if(this.y + distanciaLeon >= height){
+      this.y -= distanciaLeon;
+    }
+    else
+      this.y += distanciaLeon;   
+  }
+ 	subir(distanciaLeon){
+ 		if(this.y - distanciaLeon <= 0){
+      this.y += distanciaLeon;
+    }
+    else
+      this.y -= distanciaLeon;   
+ 	}  
 }
 
 function sleep(milliseconds) {
@@ -187,9 +204,7 @@ function setup() {
 }
 
 function draw() {
-	background(255);
-	//For (var BEGIN; END; INTERVAL){
-	//DO SOMETHING }
+	background(250);
 	for (var x = 0; x < width; x += width / 19) {
 		for (var y = 0; y < height; y += height / 19) {
 			stroke(0);
@@ -207,104 +222,29 @@ function draw() {
 	fill(0,0,255,200)
 	stroke(0,0,255)
 	rect(width/2+69, height/2-13, -138, -83);
-
-
   	//impala
   	bambi.display();
-    lionel.display();
-  	//movimientos de lionel
-  	if(lionel.x < 25 || lionel.x > 475 || lionel.y > 475 || lionel.y < 25){ //está en algún borde
-  		//console.log('borde');
-  		if(lionel.x < 25){ //izquierda
-  			if(lionel.y < 25){ //arriba
-  				//movimientos abajo derecha
-  				if(random(0,100)<50){
-  					lionel.moverD();
-  				}else{
-  					lionel.bajar();
-  				}
-  			}else{ //no arriba
-  				if(lionel.y > 475){
-  					//movimientos arriba derecha
-  					if(random(0,100)<50){
-  						lionel.subir();
-  					}else{
-  						lionel.moverD();
-  					}
-  				}else{
-  					//movimientos arriba abajo
-  					if(random(0,100)<33.3){
-  						lionel.subir();
-  					}else{
-  						if(random(1,100)<50){
-  							lionel.moverD();
-  						}else{
-  							lionel.bajar();
-  						}
-  					}
-  				}
-  			}
-  		}else{
-  			if(lionel.y < 25){
-  				//movimientos abajo izquierda
-  				if(random(0,100)<50){
-  					lionel.bajar();
-  				}else{
-  					lionel.moverI();
-  				}
-  			}else{
-  				if(lionel.y > 475){
-  					//movimientos arriba izquierda
-  					if(random(0,100)<50){
-  						lionel.subir();
-  					}else{
-  						lionel.moverI();
-  					}
-  				}else{
-  					//movimientos arriba abajo
-  					if(random(0,100)<33.3){
-  						lionel.subir();
-  					}else{
-  						if(random(0,100)<50){
-  							lionel.moverI();
-  						}else{
-  							lionel.bajar();
-  						}
-  					}
-  				}
-  			}
-  		}
-  	}else{ //no está en ningún borde -> movimiento aleatorio
-  		//console.log('ningún borde');
-  		switch(floor(random(0,4))){
-  			case 1:
-  				lionel.moverI();
-  				break;
-  			case 2:
-  				lionel.moverD();
-  				break;
-  			case 3:
-  				lionel.subir();
-  				break;
-  			default:
-  				lionel.bajar();
-  				break;
-  		}
-  	}
+    lionel.display(); 
+
+    LionelMueve(lionel); 		
 
   	fitness++; //contador de movimientos
   	//console.log(lionel.x + ','+ lionel.y);
+    BambiEvaluar(bambi, lionel);
 		if(bambi.huir == true){
 			BambiHuye(bambi);
 		}
-
-		BambiVe(bambi);
+    else{
+    BambiVe(bambi);
+  }
 
   	//momento en que lionel caza a bambi
-  	if((lionel.x == bambi.x && lionel.y == bambi.y) || (bambi.x <= 0 || bambi.x >width)){
+  	if(dist(lionel.x,lionel.y,bambi.x,bambi.y)<=27 || (bambi.x <= 0 || bambi.x >width+15)){
   		console.log('grr!');
   		console.log('Fitness: ' + fitness);
   		noLoop();
+      console.log(decisionesLeon);
+      console.log(decisionesImpala);
   	}
 
 
@@ -314,7 +254,8 @@ function draw() {
 
 //Bambi ve hacia todos lados ALV
 function BambiVe(bambi){
-switch(floor(random(0,4))){
+  let x = floor(random(0,4));
+switch(x){
 		case 1:
 			bambi.verArriba();
 			if(bambi.evaluarArriba(lionel)){
@@ -355,17 +296,73 @@ switch(floor(random(0,4))){
 			}
 			break;
 	}
+  decisionesImpala.push(x);
+}
+
+function BambiEvaluar(bambi, lionel){
+  if (dist(bambi.x,bambi.y,lionel.x,lionel.y)<=81)
+    bambi.huir=true;
+  if(lionel.ataca == true)
+    bambi.huir=true;
 }
 
 function BambiHuye(bambi){
-	switch (floor(random(0,2))) {
-		case 0:
-		bambi.moverD(distancia);
-			break;
-		case 1:
-		bambi.moverI(distancia);
-			break;
-		default:
-	}
-	distancia += 27;
+	bambi.moverD(distanciaImpala);
+	distanciaImpala += 27;
+}
+
+function LionelMueve(lionel){
+  if (lionel.ataca == false){
+    let x = floor(random(0,6))
+    switch(x){
+        case 0:
+          lionel.moverI(distanciaLeon);
+          lionel.escondido = false;
+          break;
+        case 1:
+          lionel.moverD(distanciaLeon);
+          lionel.escondido = false;
+          break;
+        case 2:
+          lionel.subir(distanciaLeon);
+          lionel.escondido = false;
+          break;
+        case 3:
+          lionel.escondido = false;
+          lionel.bajar(distanciaLeon);
+          break;
+        case 4:
+          lionel.ataca = true;
+          console.log("ataca");
+          distanciaLeon += 27 
+          break;
+        case 5:
+          lionel.escondido = true
+          console.log("escondido");
+          break;
+      }
+      decisionesLeon.push(x);
+  }
+  else{
+    let x = floor(random(0,4))
+    switch(x){
+        case 0:
+          lionel.moverI(distanciaLeon);
+          lionel.escondido = false;
+          break;
+        case 1:
+          lionel.moverD(distanciaLeon);
+          lionel.escondido = false;
+          break;
+        case 2:
+          lionel.subir(distanciaLeon);
+          lionel.escondido = false;
+          break;
+        case 3:
+          lionel.escondido = false;
+          lionel.bajar(distanciaLeon)
+          break;
+      }
+      decisionesLeon.push(x);
+  }
 }
